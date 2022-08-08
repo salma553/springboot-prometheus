@@ -1,0 +1,47 @@
+Create a docker network::: 
+> docker network create -d bridge my_network
+> docker network list
+
+
+##Springboot container run
+> mvn -Dmaven.skip.test package
+> docker build -t springbootimg .
+> docker images
+> docker run --name springbootcontainer --network my_network -p 2020:8080 -d springbootimg
+> docker ps
+
+curl --header "Content-Type: application/json" \
+  --request POST \
+  --data '{"name":"Basha","email":"basha@gmail.com","phone":"8142630030","department":"IT"}' \
+http://10.10.100.171:2020/api/employees
+
+##To check the actuator endpoints
+http://10.10.100.171:2020/actuator/prometheus
+
+
+##prometheus container run
+cd /home/basha/my-api/prometheus
+docker build -t custom_prometheus .
+docker run --name prometheuscontainer --network my_network -p 9090:9090 -d custom_prometheus
+
+http://10.10.100.171:9090
+
+##grafana container run
+docker run --name grafanacontainer --network my_network -p 3000:3000 -d grafana/grafana
+http://10.10.100.171:3000
+username: admin 	password:admin
+#In the navigation bar on the left, when you click on the gear icon, a submenu named datasource is displayed, click on it
+Go to configuration > Add data source > prometheus
+#add our previously configured Prometheus as the datasource.
+provide prometheus url : http://10.10.100.171:9090
+
+
+#####debug
+while true ; do curl http://10.10.100.171:2020/api/employees ;echo ; done
+
+while true ; do curl --header "Content-Type: application/json" \
+  --request POST \
+  --data '{"name":"Basha","email":"basha@gmail.com","phone":"8142630030","department":"IT"}' \
+http://10.10.100.171:2020/api/employees ;echo ; done
+
+
