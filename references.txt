@@ -1,0 +1,70 @@
+#Set Up Prometheus & Grafana: Monitoring an API with java
+https://www.youtube.com/results?search_query=Set+Up+Prometheus+%26+Grafana%3A+Monitoring+an+API+with+java
+...
+#Setup Grafana for Spring Boot app | Actuator, Prometheus & Grafana | Monitoring & Alerting
+https://www.youtube.com/watch?v=gJZhdEJvZmc
+...
+#Monitoring your REST api with Prometheus et Grafana
+https://medium.com/javarevisited/monitoring-your-rest-api-with-prometheus-et-grafana-6b909a7b0c69
+
+https://medium.com/@prateek_jain/rest-api-monitoring-using-micrometer-prometheus-grafana-with-spring-boot-f97de74f5f3f
+
+https://dzone.com/articles/monitoring-using-spring-boot-2-prometheus-amp-graf
+
+#Gfrana Dashboard (json)
+https://grafana.com/grafana/dashboards/12900
+...
+#API Monitoring With Prometheus, Grafana, AlertManager and VictoriaMetrics
+https://nordicapis.com/api-monitoring-with-prometheus-grafana-alertmanager-and-victoriametrics/
+
+...
+#Go api monitoring using Prometheus and Grafana Integration using Docker Compose
+https://www.neerajsidhaye.com/posts/api/monitoring/prometheus-handson/
+...
+##springboot default metrics
+https://tomgregory.com/spring-boot-default-metrics/
+http_server_requests_seconds_count is the total number of requests your application received at this endpoint
+http_server_requests_seconds_sum is the sum of the the duration of every request your application received at this endpoint
+==================================================================================================
+##Metrics from Spring Boot are not showing up in Prometheus
+(Get "http://10.10.100.171:2020/actuator/prometheus": dial tcp 10.10.100.171:2020: connect: no route to host)
+https://stackoverflow.com/questions/52263015/metrics-from-spring-boot-are-not-showing-up-in-prometheus
+
+docker inspect springbootcontainer
+IPAddress": "172.17.0.2
+
+docker inspect prometheuscontainer
+"IPAddress": "172.17.0.3"
+
+##install telnet
+yum -y install telnet
+##install ping
+yum install iputils
+
+
+##From springboot container
+telnet 10.10.100.171 9090  --> working
+telnet 10.10.100.171 3000  --> working
+ping 10.10.100.171  --> working
+ping 8.8.8.8  --> working
+
+##From prometheus container
+telnet 10.10.100.171 3000  --> working(Connected to 10.10.100.171)
+telnet 10.10.100.171 2020  --> not working(can't connect to remote host (10.10.100.171): No route to host)
+ping 8.8.8.8 --> ping: permission denied (are you root?)
+
+##inside prometheus container telnet 202.65.138.110 17807  --> not working
+testsuchitra.tk(public ip: 202.65.138.110)
+http://sims.testsuchitra.tk:17807/
+
+##
+https://github.com/prometheus/prometheus/issues/2260
+https://stackoverflow.com/questions/64078387/docker-containers-unable-to-connect-to-internet
+
+
+===========================================================================================
+##Prometheus installation in CentOS7:
+https://fitdevops.in/how-to-install-and-configure-prometheus-on-centos-7/
+
+##How to install and configure Grafana on CentOS 7
+https://www.fosslinux.com/8328/how-to-install-and-configure-grafana-on-centos-7.htm
