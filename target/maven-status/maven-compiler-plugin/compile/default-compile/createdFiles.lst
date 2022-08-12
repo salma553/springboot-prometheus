@@ -1,0 +1,7 @@
+com/example/springboot/model/Employee.class
+com/example/springboot/CorsConfiguration.class
+com/example/springboot/service/EmployeeService.class
+com/example/springboot/SpringbootAngularApplication.class
+com/example/springboot/service/EmployeeServiceImpl.class
+com/example/springboot/controller/EmployeeRestController.class
+com/example/springboot/repository/EmployeeRepository.class
