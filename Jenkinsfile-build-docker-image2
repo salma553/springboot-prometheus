@@ -20,7 +20,7 @@ pipeline{
         stage("Git Code Checkout"){
             steps{
                 //git 'https://github.com/bashacse/springboot-prometheus.git'
-		checkout([$class: 'GitSCM', branches: [[name: '*/master']], extensions: [], userRemoteConfigs: [[url: 'https://github.com/bashacse/springboot-prometheus.git']]])
+		checkout([$class: 'GitSCM', branches: [[name: 'origin/master']], extensions: [], userRemoteConfigs: [[url: 'https://github.com/bashacse/springboot-prometheus.git']]])
             }
         }
         
