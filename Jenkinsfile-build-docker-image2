@@ -1,0 +1,68 @@
+pipeline{
+    
+    //Which agent you want to run this pipeline(jenkins master slave etc)
+    agent any
+    
+    //Defining tools to build (here Maven3 is the name of the maven configuration which we defined in global tool configuration)
+    tools{
+        maven "Maven3"
+    }
+    
+    //environment block to define environments
+    environment{
+        DOCKER_TAG = getCommitId()
+        DOCKER_IMAGE_NAME = 'bashacse/springboot'
+    }
+    
+    stages{
+        
+        //Git Code Checkout
+        stage("Git Code Checkout"){
+            steps{
+                git 'https://github.com/bashacse/springboot-prometheus.git'
+            }
+        }
+        
+        //Maven Build
+        stage("Maven Build"){
+            steps{
+                //remove old build war file
+				sh 'rm -rf target'
+				sh 'mvn -Dmaven.skip.test package'
+            }
+        }
+        
+        //Docker build image
+        stage("Docker Build Image"){
+            steps{
+                    sh 'docker build . -t ${DOCKER_IMAGE_NAME}:${DOCKER_TAG}'
+                }
+        }
+        
+        //Push Image to DockerHub
+        stage("Push Docker Image"){
+            steps{
+                    withCredentials([usernamePassword(credentialsId: 'docker-hub', passwordVariable: 'dockerHubPassword', usernameVariable: 'dockerHubUserName')]) {
+                        sh 'docker login -u ${dockerHubUserName} -p ${dockerHubPassword}'
+                        sh 'docker push ${DOCKER_IMAGE_NAME}:${DOCKER_TAG}'
+                    }
+            }
+        }
+        
+        //Cleanup(remove build war file and docker image)
+        stage("Cleanup"){
+            steps{
+                sh 'rm -rf target'
+                sh 'docker rmi ${DOCKER_IMAGE_NAME}:${DOCKER_TAG}'
+            }
+        }
+    }
+    
+    
+}
+
+//writing a utility to get the recent commit id so that we can use this id as our docker tag
+def getCommitId(){
+    def id = sh(returnStdout: true, script: 'git rev-parse HEAD')
+    return id
+}
