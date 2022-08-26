@@ -8,34 +8,37 @@ pipeline{
     
     stages{
         
+        //Git code checkout
         stage("Git Checkout"){
-            
-            steps{
-                git 'https://github.com/bashacse/springboot-prometheus.git'
-            }
+           steps{
+              git 'https://github.com/bashacse/springboot-prometheus.git' 
+           } 
         }
         
+        // Maven Build
         stage("Maven Build"){
             steps{
-                sh 'rm -rf target'
-                sh 'mvn -Dmaven.skip.test package -f pom.xml'
-                sh 'mv target/*.war target/spring.war'
-                sh 'ls target'
+                sh "rm -rf target"
+                sh "mvn -Dmaven.skip.test package"
             }
         }
         
-        stage("Dev Deploy"){
+        //Build Docker Image
+        stage("Build Docker Image and Push to DockerHub"){
             steps{
-                sshagent(credentials:['8edcb285-213d-427a-9008-2b59d65e56bb']) {
-                    // for multipleline lines of script we use tripple quotes
-                    // StrictHostKeyChecking=no --> to suppress StrictHostKeyChecking
-                    // for copying to remote machine we use scp command
-                    // to execute commands in remote machine we use ssh username@ip command
-                    sh """
-                       ssh azureuser@20.213.70.79 sh /home/azureuser/app-service/bin/shutdown.sh
-                       scp -o StrictHostKeyChecking=no  target/spring.war azureuser@20.213.70.79:/home/azureuser/app-service/webapps/ROOT.war
-                       ssh azureuser@20.213.70.79 sh /home/azureuser/app-service/bin/startup.sh
-                    """
+                script{
+                  //To get the Git latest commit id
+                  GIT_COMMIT_ID = sh(returnStdout: true, script: 'git rev-parse HEAD')
+                  echo "CommitId : ${GIT_COMMIT_ID}"
+                }
+                // here docker build context('.') using prior to '-t' as I am getting errors in normal way
+                sh "docker build . -t bashacse/springboot:${GIT_COMMIT_ID}"
+                
+                //Getting credentials from Global Credentials
+                withCredentials([usernamePassword(credentialsId: 'docker-hub', passwordVariable: 'dockerHubPassword', usernameVariable: 'dockerHubUserName')]) {
+                    sh 'docker login -u ${dockerHubUserName} -p ${dockerHubPassword}'
+                    //sh 'docker login -u bashacse -p parveen$786'
+                    sh "docker push bashacse/springboot:${GIT_COMMIT_ID}"
                 }
             }
         }
