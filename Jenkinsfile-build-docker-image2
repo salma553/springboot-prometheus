@@ -1,3 +1,6 @@
+//Jenkins Build Custom Display Name
+currentBuild.displayName = "springboot-build-"+currentBuild.number
+
 pipeline{
     
     //Which agent you want to run this pipeline(jenkins master slave etc)
