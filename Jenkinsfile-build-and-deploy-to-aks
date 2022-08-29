@@ -1,0 +1,74 @@
+//Jenkins Build Custom Display Name
+currentBuild.displayName = "build-and-deploy-to-aks-"+currentBuild.number
+
+pipeline{
+    // Give agent to run the pipeline
+    agent any
+    
+    //provide build tools to package the application
+    tools{
+        maven 'Maven3'
+    }
+    
+    //environment variables
+    environment{
+        ACR_REGISTRY = 'acr4aksdem07799.azurecr.io'
+        ACR_NAMESPACE = 'service'
+        ACR_IMAGE_NAME = 'springboot'
+        ACR_IMAGE_TAG = "${currentBuild.number}"
+    }
+    
+    //Stages to build-and-deploy-to-aks
+    stages{
+        
+        //Git code checkout
+        stage("Git Checkout"){
+            steps{
+               checkout([$class: 'GitSCM', branches: [[name: '*/master']], extensions: [], userRemoteConfigs: [[url: 'https://github.com/bashacse/springboot-prometheus.git']]]) 
+            }
+        }
+        // package the application
+        stage("Maven Build"){
+            steps{
+                sh 'rm -rf target'
+                sh 'mvn -Dmaven.skip.test package'
+            }            
+        }
+        // Build the docker image
+        stage("Build Docker image"){
+            steps{
+                sh 'docker build . -t ${ACR_REGISTRY}/${ACR_NAMESPACE}/${ACR_IMAGE_NAME}:${ACR_IMAGE_TAG}'
+            }            
+        }
+        
+        //Push docker image to ACR
+        stage("Push to ACR"){
+            steps{
+                    withCredentials([usernamePassword(credentialsId: 'acr-credentials', passwordVariable: 'acrPassword', usernameVariable: 'acrUserName')]) {
+                        sh 'docker login ${ACR_REGISTRY} -u ${acrUserName} -p ${acrPassword}'
+                        sh 'docker push ${ACR_REGISTRY}/${ACR_NAMESPACE}/${ACR_IMAGE_NAME}:${ACR_IMAGE_TAG}'
+                    }             
+            }            
+        }
+        
+        //Deploy ACR images to AKS
+        stage("Deploy to AKS"){
+            steps{
+                //Run the tagChange.sh script to dynamically change the tag version inside the k8s manifest yaml
+                sh 'chmod +x k8s-manifest/tagChange.sh'
+                sh 'sh k8s-manifest/tagChange.sh ${ACR_IMAGE_TAG}'
+                sh 'az aks get-credentials --resource-group terraform-aks-dev --name terraform-aks-dev-cluster --admin --overwrite'
+                sh 'kubectl get nodes'
+                sh 'kubectl apply -f springboot-deployment.yaml'
+            }
+        }
+        
+        //Cleanup(remove build war file and local docker image)
+        stage("Clean Up"){
+            steps{
+                sh 'rm -rf target'
+                sh 'docker rmi ${ACR_REGISTRY}/${ACR_NAMESPACE}/${ACR_IMAGE_NAME}:${ACR_IMAGE_TAG} -f'
+            }            
+        }
+    }
+}
