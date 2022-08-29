@@ -15,7 +15,7 @@ spec:
         app: springboot
     spec:
       containers:
-      - image: acr4aksdem07799.azurecr.io/service/springboot:6
+      - image: acr4aksdem07799.azurecr.io/service/springboot:7
         name: service
         # imagePullPolicy: Never
         # resources: {}
