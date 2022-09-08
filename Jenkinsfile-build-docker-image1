@@ -37,7 +37,7 @@ pipeline{
                 //Getting credentials from Global Credentials
                 withCredentials([usernamePassword(credentialsId: 'docker-hub', passwordVariable: 'dockerHubPassword', usernameVariable: 'dockerHubUserName')]) {
                     sh 'docker login -u ${dockerHubUserName} -p ${dockerHubPassword}'
-                    //sh 'docker login -u bashacse -p parveen$786'
+                    //sh 'docker login -u bashacse -p ****'
                     sh "docker push bashacse/springboot:${GIT_COMMIT_ID}"
                 }
             }
