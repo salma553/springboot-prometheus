@@ -15,7 +15,7 @@ spec:
         app: springboot
     spec:
       containers:
-      - image: bashacse/springboot:api-logging
+      - image: salma553/springboot:v4
         name: service
         # imagePullPolicy: Never
         # resources: {}
