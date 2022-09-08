@@ -68,3 +68,7 @@ https://fitdevops.in/how-to-install-and-configure-prometheus-on-centos-7/
 
 ##How to install and configure Grafana on CentOS 7
 https://www.fosslinux.com/8328/how-to-install-and-configure-grafana-on-centos-7.htm
+
+
+##prometheus config for springboot url auth
+https://stackoverflow.com/questions/64031121/configure-basic-auth-for-prometheus-target
