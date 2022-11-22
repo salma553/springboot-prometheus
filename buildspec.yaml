@@ -7,15 +7,15 @@ phases:
       - rm -rf target
       - mvn -Dmaven.skip.test package
       - echo Logging in to Amazon ECR...
-      - $(aws ecr get-login --no-include-email --region us-east-1)
+      - $(aws ecr get-login --no-include-email --region $AWS_DEFAULT_REGION)
   build:
     commands:
       - echo Build started on `date`
       - echo Building the Docker image...
       - docker build -t angular .
-      - docker tag angular:latest 090187438878.dkr.ecr.us-east-1.amazonaws.com/demo-pipeline-repo:v1      
+      - docker tag angular:latest 090187438878.dkr.ecr.us-east-1.amazonaws.com/demo-pipeline-repo:$IMAGE_TAG      
   post_build:
     commands:
       - echo Build completed on `date`
       - echo Pushing the Docker image...
-      - docker push 090187438878.dkr.ecr.us-east-1.amazonaws.com/demo-pipeline-repo:v1
+      - docker push 090187438878.dkr.ecr.us-east-1.amazonaws.com/demo-pipeline-repo:$IMAGE_TAG
