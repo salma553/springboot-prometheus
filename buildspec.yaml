@@ -13,9 +13,9 @@ phases:
       - echo Build started on `date`
       - echo Building the Docker image...
       - docker build -t angular .
-      - docker tag angular:latest 090187438878.dkr.ecr.us-east-1.amazonaws.com/demo-pipeline-repo:$IMAGE_TAG      
+      - docker tag angular:latest 090187438878.dkr.ecr.us-east-1.amazonaws.com/demo-pipeline-repo:latest    
   post_build:
     commands:
       - echo Build completed on `date`
       - echo Pushing the Docker image...
-      - docker push 090187438878.dkr.ecr.us-east-1.amazonaws.com/demo-pipeline-repo:$IMAGE_TAG
+      - docker push 090187438878.dkr.ecr.us-east-1.amazonaws.com/demo-pipeline-repo:latest
